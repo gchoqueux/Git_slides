@@ -1,0 +1,649 @@
+---
+title: "Atelier de Git"
+format:
+  revealjs:
+    theme: [dark, custom.scss]
+    css: style.css
+    slide-number: true
+    chalkboard:
+      buttons: false
+    preview-links: auto
+    code-line-numbers: false
+    echo: true
+    output-location: column-fragment
+    width: 1900
+    height: 1200
+code-tools:
+   source: true
+engine: knitr
+editor: 
+  render-on-save: true
+---
+
+
+# Atelier de Git
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" integrity="sha512-XXX" crossorigin="anonymous" />
+
+
+```{bash, starter}
+#| echo: false
+#| output: false 
+cd /home/GChoqueux/code/gitTut
+git rebase --quit
+git checkout -- .
+git checkout master
+git branch -D new_feature_D
+git branch -D cp_feature_D
+git reset --hard aa2c0243cd1045497e5aededf832e5ae5bf0fe2b
+git reflog expire --expire-unreachable=now --all
+git gc --prune=now
+ls
+```
+
+**C'est quoi GIT?**
+
+Git est un logiciel de gestion de versions décentralisé.
+
+Git ne repose pas sur un serveur centralisé, mais il utilise un système de connexion pair à pair.
+
+**Chaque utilisateur qui clone un dépôt Git obtient une copie complète de l'historique du projet ainsi que la possibilité de travailler en mode déconnecté.**
+
+::: {.callout-caution}
+## local et distant
+il peut exister une notion de local et distant.
+:::
+
+https://github.com/gchoqueux/Atelier_Git
+
+
+# Commencer avec git
+
+Création d'un nouveau dépot git
+
+```{bash , eval=FALSE}
+#| output-location: default
+git init
+```
+
+Cloner un dépot existant
+```{bash , eval=FALSE}
+#| output-location: default
+git clone <url>
+```
+
+Afficher l'état actuel du répertoire de travail et de la zone de préparation (staging) 
+```{bash , eval=FALSE}
+#| output-location: default
+git status
+```
+
+:::: {.columns}
+::: {.column width="50%"}
+
+Se déplacer au niveau d’un commit  
+```{bash , eval = FALSE}
+#| output-location: default
+git checkout <commit num> 
+
+```
+:::
+
+::: {.column width="50%"}
+<img border="rounded" src="https://supports.uptime-formation.fr/images/head_point_3.jpg?raw=true" alt="">
+:::
+::::
+
+
+# voir les différences
+
+La commande `git diff` est utilisée pour afficher les différences entre deux états de l'arbre de travail Git
+
+```{bash, eval=FALSE}
+#| output-location: default
+git diff <commit1SHA> <commit2SHA>
+git diff <branchName>
+```
+
+# Git log
+
+Afficher la liste des commits
+```{bash , eval = FALSE}
+#| output-location: default
+git log
+```
+
+Afficher en graphe, sur une ligne, avec le message de commit en abbrégé
+```{bash , eval = FALSE}
+#| output-location: default
+git log --graph --pretty=oneline --abbrev-commit
+```
+
+# Les états des fichiers
+:::: {.columns}
+::: {.column width="50%"}
+
+* Non suivi (`untracked`).
+* Modifié (`modified`) ;
+* Indexé (`staged`) ;
+* non modifié/ commité (`committed`);
+* Ignoré (`ignored`);
+:::
+
+::: {.column width="50%"}
+<img  class="w-1000 m-auto mt-105" src="https://www.pierre-giraud.com/wp-content/uploads/2019/12/etat-fichier-git.png" height="400" alt="">
+:::
+::::
+
+# Changer d'états
+
+**Etat `indexé` <i class="fas fa-arrow-right"></i>  `modifié`**
+
+```{bash , eval=FALSE}
+#| output-location: default
+git reset HEAD nom-du-fichier.
+```
+
+
+**Ignoré**  
+
+* `.gitignore` pour l'ensemble des utilisateurs
+* `.git/info/exclude`  pour votre utilisation
+
+```{bash , eval=FALSE}
+#| output-location: default
+# fichier
+a.txt
+# dossier
+foo/
+# pattern
+*.bin
+# logs/debug.log
+# logs/monday/debug.log
+# logs/monday/pm/debug.log 
+logs/**/debug.log 
+```
+
+# Ajouter un branche
+
+```{bash , echo=c(-1)}
+cd /home/GChoqueux/code/gitTut
+git log --graph --pretty=oneline --abbrev-commit --all --decorate
+```
+
+Ajouter la branche `new_feature_D`
+
+```{bash , echo=c(-1)}
+cd /home/GChoqueux/code/gitTut
+git branch new_feature_D
+git checkout new_feature_D
+```
+
+ça donne quoi
+```{bash , echo=c(-1)}
+cd /home/GChoqueux/code/gitTut
+git log --graph --pretty=oneline --abbrev-commit --all --decorate
+```
+
+# ajouter à l'index et le commiter
+Créer un nouveau fichier `file_D.roc` 
+```{bash, echo=c(-1, -2), cp_file}
+#| class-output: file_content
+ cd /home/GChoqueux/code/gitTut/
+cp ./raw/file_D.roc ./file_D.roc
+more ./file_D.roc
+```
+
+Ajouter le fichier `file_D.roc`
+```{bash, echo=c(-1), add_file}
+cd /home/GChoqueux/code/gitTut/
+git add ./file_D.roc
+git status
+```
+
+Commit le nouveau fichier
+```{bash, echo=c(-1 ), commit}
+cd /home/GChoqueux/code/gitTut/
+git commit -m 'feature(core): add core method D'
+```
+
+Explorer Les branches
+```{bash , echo=c(-1)}
+cd /home/GChoqueux/code/gitTut
+git diff master new_feature_D
+```
+
+
+
+## Merge
+
+::: {.callout-note}
+## Fonctionnement
+Lorsque vous fusionnez des branches, Git crée un nouveau commit de fusion qui combine les changements des deux branches. Ce commit de fusion a deux parents, un pour chaque branche fusionnée
+:::
+
+::: {.callout-tip}
+## Avantages
+* Plus simple et plus direct à utiliser. 
+* Préserve l'historique de chaque branche, montrant clairement où la fusion a eu lieu.
+:::
+
+::: {.callout-warning}
+## Inconvénients
+* Peut créer une historique de commit "enchevêtrée" si des fusions fréquentes sont effectuées. 
+* Les messages de commit de fusion peuvent parfois être verbeux.
+:::
+
+## Rebase
+
+::: {.callout-note}
+## Fonctionnement
+Lorsque vous effectuez un rebase, Git prend les modifications de la branche source et les applique une par une au sommet de la branche cible. Cela récrit l'historique de la branche source pour qu'elle paraisse comme si elle avait été développée à partir du dernier commit de la branche cible.
+:::
+
+::: {.callout-tip}
+## Avantages
+* Historique de commit linéaire et plus propre.
+* Évite les commits de fusion inutiles.
+:::
+
+::: {.callout-warning}
+## Inconvénients
+* Modifie l'historique de la branche source, ce qui peut poser des problèmes si la branche est partagée avec d'autres développeurs
+* Peut être plus complexe en cas de conflits.
+:::
+
+# rebase interactif
+
+```ts
+// rebase interactif sur les 3 derniers commits
+git rebase -i HEAD~3
+```
+
+* `pick commit` : utiliser le commit
+
+* `reword commit` : utiliser le commit, mais reformuler son message
+
+* `edit commit` : utiliser le commit, mais s’arrêter pour le modifier
+
+* `squash commit` : utiliser le commit, mais le fusionner avec le précédent
+
+* `fixup commit` : comme "squash", mais en éliminant son message
+
+* changer l'ordre des commits en modifiant l'ordre des lignes
+
+::: {.callout-tip}
+## Annuler un rebase en cours
+```ts
+git rebase --abort
+```
+:::
+
+# Exemple de rebase : déplacement de commit 
+
+```{bash , echo=c(-1)}
+cd /home/GChoqueux/code/gitTut
+git log --graph --pretty=oneline --abbrev-commit --all
+``` 
+
+Lancement du rebase
+```{bash eval=TRUE, echo=c(5), rebase_test}
+#| class-output: rebase_edition
+cd /home/GChoqueux/code/gitTut
+exec 3>&2 
+exec 2> /dev/null
+export GIT_SEQUENCE_EDITOR='head -n 2'
+git rebase -i HEAD~2
+exec 2>&3 
+```
+
+Nous inversons les lignes de commits
+```{bash eval=TRUE, echo=c(5), rebase_test2}
+#| class-output: rebase_edition
+cd /home/GChoqueux/code/gitTut
+exec 3>&2
+exec 2> /dev/null
+export GIT_SEQUENCE_EDITOR='/home/GChoqueux/Documents/Cours/Git_slides/script/script.sh'
+git rebase -i HEAD~2
+exec 2>&3 
+```
+Log
+```{bash , echo=c(-1), highlight="console"}
+cd /home/GChoqueux/code/gitTut
+git log --graph --pretty=oneline --abbrev-commit new_feature_D
+```
+
+# rebase : déplacement et fix d'un commit 1/2
+
+Le fichier avec l'erreur
+
+```{bash , echo=c(-1)}
+#| class-output: rebase_edition
+cd /home/GChoqueux/code/gitTut
+head ./file_D.roc
+```
+
+Reparer la méthode
+```{bash , echo=c(-1, -2)}
+#| class-output: file_content
+cd /home/GChoqueux/code/gitTut
+sed -i 's/d;/d+1;/g' ./file_D.roc
+head ./file_D.roc
+```
+
+Commiter les modifications au cache
+```{bash, echo=c(-1 )}
+cd /home/GChoqueux/code/gitTut/
+git commit -a -m 'fix(core): fix return value in method D'
+```
+
+# rebase : déplacement et fix d'un commit 2/2
+
+Le nouveau graphe 
+```{bash , echo=c(-1), highlight="console"}
+cd /home/GChoqueux/code/gitTut
+git log --graph --pretty=oneline --abbrev-commit new_feature_D
+```
+
+Rebase pour revenir 3 commits en arrère
+  
+```{bash,echo=c(5)}
+#| class-output: rebase_edition
+cd /home/GChoqueux/code/gitTut
+exec 3>&2
+exec 2> /dev/null
+export GIT_SEQUENCE_EDITOR='/home/GChoqueux/Documents/Cours/Git_slides/script/script_rebase_fix.sh'
+git rebase -i HEAD~3
+exec 2>&3 
+```
+Le nouveau graphe aprés le rebase
+```{bash , echo=c(-1)}
+cd /home/GChoqueux/code/gitTut
+git log --graph --pretty=oneline --abbrev-commit new_feature_D
+``` 
+
+# Rebase sur la branche master
+
+```{bash , echo=c(4), highlight="console"}
+cd /home/GChoqueux/code/gitTut
+git checkout -b cp_feature_D
+git checkout new_feature_D
+git log --graph --pretty=oneline --abbrev-commit master new_feature_D --decorate
+```
+
+```{bash,echo=c(-1)}
+cd /home/GChoqueux/code/gitTut
+git rebase master
+```
+Final 
+```{bash , echo=c(-1), highlight="console"}
+cd /home/GChoqueux/code/gitTut
+git log --graph --pretty=oneline --abbrev-commit master new_feature_D --decorate
+```
+
+# Merge
+
+```{bash , echo=c(3), highlight="console"}
+cd /home/GChoqueux/code/gitTut
+git checkout master 
+git log --graph --pretty=oneline --abbrev-commit master cp_feature_D --decorate
+```
+
+```{bash,echo=c(-1)}
+cd /home/GChoqueux/code/gitTut
+git merge cp_feature_D
+```
+Final 
+```{bash , echo=c(-1), highlight="console"} 
+cd /home/GChoqueux/code/gitTut
+git log --graph --pretty=oneline --abbrev-commit master --decorate
+```
+
+# Commandes avec un depot distant
+
+Récupérer les modifations d'un dépot distant sans fusionner avec sa branche
+```ts
+git fetch
+```
+
+Récupérer les modifations d'un dépot distant en fusionant avec sa branche
+(bouge le HEAD)
+```ts
+git pull
+```
+
+Les données locales sont envoyés de la branche actuelle jusqu’au dépôt distant
+(bouge le HEAD distant, modifie origin/HEAD)
+```ts
+git push 
+```
+
+# Remonter dans l'historique 1/3
+
+Reset sur branche : la branche courante aura le même historique cette branche
+```{bash , echo=c(3)}
+cd /home/GChoqueux/code/gitTut
+git checkout cp_feature_D 
+git reset master
+git log --graph --pretty=oneline --abbrev-commit cp_feature_D master --decorate
+```
+
+Reset HEAD~n : n<sup>ème</sup> parent du commit 
+```{bash , echo=c(-1)}
+cd /home/GChoqueux/code/gitTut
+git reset HEAD~1
+
+git log --graph --pretty=oneline --abbrev-commit cp_feature_D
+```
+
+# Remonter dans l'historique 2/3
+
+Reset sur branche : la branche courante aura le même historique cette branche
+```{bash , echo=c(3)}
+cd /home/GChoqueux/code/gitTut
+git checkout cp_feature_D 
+git reset master
+git log --graph --pretty=oneline --abbrev-commit cp_feature_D master --decorate
+```
+
+Reset HEAD^n : fait référence au n<sup>ème</sup> parent
+```{bash , echo=c(-1)}
+cd /home/GChoqueux/code/gitTut
+git reset HEAD^2
+
+git log --graph --pretty=oneline --abbrev-commit cp_feature_D
+```
+
+# Remonter dans l'historique 2/3
+
+supprimer des commits specifiques
+```{bash , eval=FALSE} 
+#| output-location: default
+git rebase -i <hash>
+```
+
+Réinitialiser le HEAD au commit indiqué : 
+```{bash , eval=FALSE} 
+#| output-location: default
+git reset
+```
+
+Réinitialiser le HEAD au commit indiqué en perdant les modifications
+```{bash , eval=FALSE} 
+#| output-location: default
+git reset --hard
+```
+
+Comment pousser si il y a une modification d'historique 
+```{bash , eval=FALSE} 
+#| output-location: default
+git push origin HEAD --force
+```
+
+Commit inverse des modifications effectué au dernier commit
+```{bash , eval=FALSE} 
+#| output-location: default 
+git revert HEAD
+```
+
+# Supression de fichier
+
+Pour supprimer un fichier, sans prevenir git
+```{bash , eval=FALSE} 
+#| output-location: default
+rm file.text
+```
+
+Pour supprimer un fichier, en prevenant git
+```{bash , eval=FALSE} 
+#| output-location: default
+git rm file.text 
+```
+
+Renomer un ficher en gardant l'historique sur le fichier
+```{bash , eval=FALSE} 
+#| output-location: default
+git mv ancien-nom-fichier nouveau-nom-fichier
+```
+
+Nettoyer toute une branche
+```{bash , eval=FALSE} 
+#| output-location: default
+git filter-branch --index-filter 'git rm --cached --ignore-unmatch dum.bin'
+```
+
+# Annuler des actions
+
+Commit et squash avec le parent
+```js
+git commit--amend
+```
+Restore: annule les modifications locales non validées
+```js
+git restore LISEZMOI.txt. --> voir explication : annuler modification indexer ou non
+```
+le revert : créer un nouveau commit qui annule les changements apportés par un ou plusieurs commits antérieurs
+```js
+git revert 
+```
+
+# les bonnes pratiques
+
+**Pour contribuer :**
+
+* forker le depot main
+* cloner le puis ajouter le remote main
+* ajouter un connexion distante
+
+```{bash , eval=FALSE} 
+#| output-location: default
+git remote add main <url>
+```
+
+* creer une branche a partir du `main/master` pour etre sur d'etre à jour.
+* au final fusionner/rebaser dans `main/master`
+
+::: {.callout-caution}
+## Attention
+Assurez vous de se rebaser, régulièrement, votre branche sur la main/master
+:::
+```{bash , eval=FALSE} 
+#| output-location: default
+git rebase -i sur le origin/master
+```
+
+## Modification du code
+
+* créer une branche avec son périmètre
+* decouper les modifications en sous-perimètres
+* créer un commit par sous-périmètre
+* écrire les nouveaux tests
+* à chaque étape de l'historique le code doit passer les testes unitaires
+
+::: {.callout-caution}
+## Attention
+Ne pas avoir de modification de même sous périmètre dans plusieurs commits
+:::
+
+```{bash , eval=FALSE} 
+#| output-location: default
+git rebase -i sur le origin/master
+```
+
+::: {.callout-tip}
+## Les messages des commits
+Faites des messages claires
+
+<https://github.com/angular/angular/blob/main/CONTRIBUTING.md#commit>
+:::
+
+# Securité
+
+Types de connection au dépot distant
+
+* https
+* ssh
+
+**Les commits signés**
+
+```{bash , eval=FALSE} 
+#| output-location: default
+git config commit.gpgsign true
+git commit -S -m "votre_message"
+```
+
+# Divers
+ 
+Création d'un alias unstage
+```{bash , eval=FALSE} 
+#| output-location: default
+git config --global alias.unstage 'reset HEAD --'
+git unstage fileA
+```
+
+Mettre sur etagère
+```{bash , eval=FALSE} 
+#| output-location: default
+git stash
+```
+
+Piquorer un commit (cherry pick)
+```{bash , eval=FALSE} 
+#| output-location: default
+git cherry-pick
+```
+Retrouver les commits perdues
+```{bash , eval=FALSE} 
+#| output-location: default
+git reflog
+```
+
+Maitriser les périmètres des modifications par lignes
+```{bash , eval=FALSE} 
+#| output-location: default
+git add -p
+```
+
+# La revue de code dans les merges/pull request
+**Enormes avantages**
+
+* amélioration du code
+* Connaissance de l'évolution du code
+* Monter en compétence
+* comprehension du code
+
+# Fin
+
+```{bash, echo=c(-1), clean}
+#| code-fold: true
+cd /home/GChoqueux/code/gitTut
+git checkout -- .
+git checkout master
+git branch -D new_feature_D
+git branch -D cp_feature_D
+git reset --hard aa2c0243cd1045497e5aededf832e5ae5bf0fe2b
+git reflog expire --expire-unreachable=now --all
+git gc --prune=now
+ls
+```

@@ -1,0 +1,33 @@
+.reveal pre code {
+  background-color: rgb(67, 67, 102);
+  border-radius:4px
+}
+
+.reveal div.sourceCode {
+  border: 0px solid #444444;
+}
+
+.reveal pre.sourceCode code {
+  background-color:#444444;
+} 
+
+.reveal[data-navigation-mode="linear"] .title-slide h1 {
+  font-size: 2em;
+} 
+
+.reveal .column-output-location .column:first-of-type div.sourceCode {
+  background-color:#444444;
+}
+
+
+.reveal pre.rebase_edition code {
+  background-color: rgb(150, 41, 135);
+}
+
+.reveal pre.file_content code {
+  background-color: rgb(17, 146, 92);
+}
+
+.fa-arrow-right {
+  font-size: 30px; /* ajustez la taille selon vos besoins */
+}
