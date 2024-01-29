@@ -11,7 +11,7 @@ format:
     code-line-numbers: false
     echo: true
     output-location: column-fragment
-    width: 1900
+    width: 2000
     height: 1200
 code-tools:
    source: true
@@ -120,6 +120,14 @@ Afficher en graphe, sur une ligne, avec le message de commit en abbrégé
 git log --graph --pretty=oneline --abbrev-commit
 ```
 
+# Création d'un alias
+```{bash , echo=c(-1)}
+#| output-location: default
+cd /home/GChoqueux/code/gitTut
+git config --global alias.llog 'log --graph --pretty=oneline --abbrev-commit --decorate'
+git llog
+```
+
 # Les états des fichiers
 :::: {.columns}
 ::: {.column width="50%"}
@@ -169,7 +177,7 @@ logs/**/debug.log
 
 ```{bash , echo=c(-1)}
 cd /home/GChoqueux/code/gitTut
-git log --graph --pretty=oneline --abbrev-commit --all --decorate
+git llog
 ```
 
 Ajouter la branche `new_feature_D`
@@ -183,7 +191,7 @@ git checkout new_feature_D
 ça donne quoi
 ```{bash , echo=c(-1)}
 cd /home/GChoqueux/code/gitTut
-git log --graph --pretty=oneline --abbrev-commit --all --decorate
+git llog
 ```
 
 # ajouter à l'index et le commiter
@@ -280,11 +288,19 @@ git rebase --abort
 ```
 :::
 
+# Comment changer l'editeur de texte pour Git
+
+```{bash eval=FALSE}
+#| output-location: default
+git config --global core.editor emacs
+git config --global core.editor "'C:/Program Files/Notepad++/notepad++.exe'
+```
+
 # Exemple de rebase : déplacement de commit 
 
 ```{bash , echo=c(-1)}
 cd /home/GChoqueux/code/gitTut
-git log --graph --pretty=oneline --abbrev-commit --all
+git llog
 ``` 
 
 Lancement du rebase
@@ -311,7 +327,7 @@ exec 2>&3
 Log
 ```{bash , echo=c(-1), highlight="console"}
 cd /home/GChoqueux/code/gitTut
-git log --graph --pretty=oneline --abbrev-commit new_feature_D
+git llog new_feature_D
 ```
 
 # rebase : déplacement et fix d'un commit 1/2
@@ -343,7 +359,7 @@ git commit -a -m 'fix(core): fix return value in method D'
 Le nouveau graphe 
 ```{bash , echo=c(-1), highlight="console"}
 cd /home/GChoqueux/code/gitTut
-git log --graph --pretty=oneline --abbrev-commit new_feature_D
+git llog new_feature_D
 ```
 
 Rebase pour revenir 3 commits en arrère
@@ -360,34 +376,40 @@ exec 2>&3
 Le nouveau graphe aprés le rebase
 ```{bash , echo=c(-1)}
 cd /home/GChoqueux/code/gitTut
-git log --graph --pretty=oneline --abbrev-commit new_feature_D
+git llog new_feature_D
 ``` 
 
 # Rebase sur la branche master
 
-```{bash , echo=c(4), highlight="console"}
+```{bash, echo=c(-1)}
 cd /home/GChoqueux/code/gitTut
 git checkout -b cp_feature_D
-git checkout new_feature_D
-git log --graph --pretty=oneline --abbrev-commit master new_feature_D --decorate
 ```
 
+```{bash , echo=c(3), highlight="console"}
+cd /home/GChoqueux/code/gitTut
+git checkout new_feature_D
+git llog master new_feature_D
+```
+
+Rebase sur master 
 ```{bash,echo=c(-1)}
 cd /home/GChoqueux/code/gitTut
 git rebase master
 ```
+
 Final 
 ```{bash , echo=c(-1), highlight="console"}
 cd /home/GChoqueux/code/gitTut
-git log --graph --pretty=oneline --abbrev-commit master new_feature_D --decorate
+git llog master new_feature_D
 ```
 
 # Merge
 
-```{bash , echo=c(3), highlight="console"}
+```{bash , echo=c(-1), highlight="console"}
 cd /home/GChoqueux/code/gitTut
 git checkout master 
-git log --graph --pretty=oneline --abbrev-commit master cp_feature_D --decorate
+git llog master cp_feature_D
 ```
 
 ```{bash,echo=c(-1)}
@@ -397,7 +419,7 @@ git merge cp_feature_D
 Final 
 ```{bash , echo=c(-1), highlight="console"} 
 cd /home/GChoqueux/code/gitTut
-git log --graph --pretty=oneline --abbrev-commit master --decorate
+git llog master
 ```
 
 # Commandes avec un depot distant
@@ -422,11 +444,11 @@ git push
 # Remonter dans l'historique 1/3
 
 Reset sur branche : la branche courante aura le même historique cette branche
-```{bash , echo=c(3)}
+```{bash , echo=c(-1)}
 cd /home/GChoqueux/code/gitTut
 git checkout cp_feature_D 
 git reset master
-git log --graph --pretty=oneline --abbrev-commit cp_feature_D master --decorate
+git llog cp_feature_D master
 ```
 
 Reset HEAD~n : n<sup>ème</sup> parent du commit 
@@ -434,7 +456,7 @@ Reset HEAD~n : n<sup>ème</sup> parent du commit
 cd /home/GChoqueux/code/gitTut
 git reset HEAD~1
 
-git log --graph --pretty=oneline --abbrev-commit cp_feature_D
+git llog cp_feature_D
 ```
 
 # Remonter dans l'historique 2/3
@@ -444,7 +466,7 @@ Reset sur branche : la branche courante aura le même historique cette branche
 cd /home/GChoqueux/code/gitTut
 git checkout cp_feature_D 
 git reset master
-git log --graph --pretty=oneline --abbrev-commit cp_feature_D master --decorate
+git llog cp_feature_D master
 ```
 
 Reset HEAD^n : fait référence au n<sup>ème</sup> parent
@@ -452,7 +474,7 @@ Reset HEAD^n : fait référence au n<sup>ème</sup> parent
 cd /home/GChoqueux/code/gitTut
 git reset HEAD^2
 
-git log --graph --pretty=oneline --abbrev-commit cp_feature_D
+git llog cp_feature_D
 ```
 
 # Remonter dans l'historique 2/3
@@ -479,12 +501,6 @@ Comment pousser si il y a une modification d'historique
 ```{bash , eval=FALSE} 
 #| output-location: default
 git push origin HEAD --force
-```
-
-Commit inverse des modifications effectué au dernier commit
-```{bash , eval=FALSE} 
-#| output-location: default 
-git revert HEAD
 ```
 
 # Supression de fichier
@@ -550,7 +566,7 @@ Assurez vous de se rebaser, régulièrement, votre branche sur la main/master
 :::
 ```{bash , eval=FALSE} 
 #| output-location: default
-git rebase -i sur le origin/master
+git rebase -i sur le main/master
 ```
 
 ## Modification du code
@@ -594,13 +610,6 @@ git commit -S -m "votre_message"
 ```
 
 # Divers
- 
-Création d'un alias unstage
-```{bash , eval=FALSE} 
-#| output-location: default
-git config --global alias.unstage 'reset HEAD --'
-git unstage fileA
-```
 
 Mettre sur etagère
 ```{bash , eval=FALSE} 
